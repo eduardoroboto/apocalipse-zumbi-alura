@@ -7,10 +7,25 @@ public class Bala : MonoBehaviour
 
     public float Velocidade = 20;
 
-    void FixedUpdate()
+    private Rigidbody rigidbodyBala;
+
+    void Start() 
     {
-        Vector3 posicaoAtual = GetComponent<Rigidbody>().position;
-        Vector3 direcaoDaBala = transform.forward;
-        GetComponent<Rigidbody>().MovePosition(posicaoAtual + direcaoDaBala * Velocidade * Time.deltaTime);
+       rigidbodyBala = GetComponent<Rigidbody>();
     }
+
+    void FixedUpdate()
+{
+        rigidbodyBala.MovePosition(rigidbodyBala.position + transform.forward * Velocidade * Time.deltaTime);
+    }
+
+    void OnTriggerEnter(Collider objectoDeColisao)
+    {
+        if (objectoDeColisao.tag == "Inimigo")
+        {
+            Destroy(objectoDeColisao.gameObject);
+        }
+        Destroy(gameObject);
+    }
+
 }

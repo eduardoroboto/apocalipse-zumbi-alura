@@ -8,36 +8,49 @@ public class ControlaInimigo : MonoBehaviour
     public GameObject Jogador;
     public float Velocidade = 5;
 
+    private Rigidbody rigidbodyInimigo;
+    private Animator animatorInimigo;
+
+    private ControlaJogador controlaJogador;
+
     // Start is called before the first frame update
     void Start()
     {
+        Jogador = GameObject.FindWithTag("Jogador");
+        int geraTipoZumbi = Random.Range(1,28);
+        transform.GetChild(geraTipoZumbi).gameObject.SetActive(true);
 
-    }
+        rigidbodyInimigo = GetComponent<Rigidbody>();
+        animatorInimigo = GetComponent<Animator>();
 
-    // Update is called once per frame
-    void Update()
-    {
+        controlaJogador = Jogador.GetComponent<ControlaJogador>();
 
     }
 
     void FixedUpdate()
     {
-        Vector3 posicaoAtual = GetComponent<Rigidbody>().position;
-        Vector3 posicaoJogador = Jogador.transform.position;
-        Vector3 posicaoInimigo = transform.position;
-
-        float distancia = Vector3.Distance(posicaoInimigo, posicaoJogador);
+        float distancia = Vector3.Distance(transform.position, Jogador.transform.position);
+        Vector3 direcao = Jogador.transform.position - transform.position;
+        Quaternion novaRotacao = Quaternion.LookRotation(direcao);
+        rigidbodyInimigo.MoveRotation(novaRotacao);
 
         if (distancia > 2.5)
         {
-            Vector3 direcao = posicaoJogador - posicaoInimigo;
-            GetComponent<Rigidbody>().MovePosition(posicaoAtual + direcao.normalized * Velocidade * Time.deltaTime);
-
-            Quaternion novaRotacao = Quaternion.LookRotation(direcao);
-            GetComponent<Rigidbody>().MoveRotation(novaRotacao);
-
+            rigidbodyInimigo.MovePosition(rigidbodyInimigo.position + direcao.normalized * Velocidade * Time.deltaTime);
+            animatorInimigo.SetBool("Atacando", false);
+        }
+        else
+        {
+            animatorInimigo.SetBool("Atacando", true);
         }
 
+    }
+
+    void AtacaJogador()
+    {
+        Time.timeScale = 0;
+        controlaJogador.TextoGameOver.SetActive(true);
+        controlaJogador.Vivo = false;
     }
 
 }
